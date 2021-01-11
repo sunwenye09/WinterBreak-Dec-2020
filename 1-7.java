@@ -109,3 +109,38 @@ public class Solution {
         return false;
     }
 }
+
+//131. Palindrome Partitioning
+class Solution {
+    public List<List<String>> partition(String s) {
+        List<List<String>> lst = new ArrayList<>();
+        backtrack(s, lst, new ArrayList<String>(), 0);
+        return lst;
+    }
+    private void backtrack(String s, List<List<String>> lst, List<String> subList, int start) {
+        if (start == s.length()) {
+            lst.add(new ArrayList<String>(subList));
+            return;
+        }
+        for (int i = start + 1; i <= s.length(); i++) {
+            String str = s.substring(start, i);
+            if (isPalindrome(str)) {
+                subList.add(str);
+                backtrack(s, lst, subList, i);
+                subList.remove(subList.size() - 1);
+            }
+        }
+    }
+    private boolean isPalindrome(String str) {
+        int left = 0, right = str.length() - 1;
+        while (left < right) {
+            if (str.charAt(left) != str.charAt(right)) {
+                return false;
+            } else {
+                left++;
+                right--;
+            }
+        }
+        return true;
+    }
+}
