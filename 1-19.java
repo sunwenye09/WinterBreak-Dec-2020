@@ -79,3 +79,77 @@ public class Solution {
         }
     }
 }
+
+//126. Word Ladder II
+class Solution {
+    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+        List<List<String>> ladders = new ArrayList<>();
+        HashSet<String> dict = new HashSet(wordList);
+        if (!dict.contains(endWord)) {
+            return ladders;
+        }
+        Map<String, List<String>> neighbors = new HashMap<>();
+        Map<String, Integer> distance = new HashMap<>();
+        dict.add(beginWord);
+        //bfs to find distances of all nodes. end -> start
+        bfs(neighbors, distance, endWord, beginWord, dict);
+        //dfs to find all ladders. start -> end
+        List<String> path = new ArrayList<>();
+        dfs(ladders,path, beginWord, endWord, distance, neighbors);
+        
+        return ladders;
+    }
+    
+    private void dfs(List<List<String>> ladders, List<String> path, String start, String end, Map<String, Integer> distance, Map<String, List<String>> neighbors) {
+        path.add(start);
+        if (start.equals(end)) {
+            ladders.add(new ArrayList<String>(path));
+        } else {
+            for (String word : neighbors.get(start)) {
+                if (distance.containsKey(word) && distance.get(start) - 1 == distance.get(word)) {
+                    dfs(ladders, path, word, end, distance, neighbors);
+                }
+            }
+        }
+        //backtrack
+        path.remove(path.size() - 1);
+    }
+    
+    private void bfs(Map<String, List<String>> neighbors, Map<String, Integer> distance, String start, String end, HashSet<String> dict) {
+        Queue<String> queue = new LinkedList<String>();
+        //initiallization
+        queue.offer(start);
+        distance.put(start, 0);
+        for (String s : dict) {
+            neighbors.put(s, new ArrayList<String>());
+        }
+        //build neighbors and calculate distances
+        while (!queue.isEmpty()) {
+            String curr = queue.poll();
+            List<String> neighbor = getNeighbor(curr, dict);
+            for (String word : neighbor) {
+                neighbors.get(word).add(curr);
+                if (distance.containsKey(word)) {
+                    continue;
+                }
+                distance.put(word, distance.get(curr) + 1);
+                queue.offer(word);
+            }
+        }
+    }
+    private List<String> getNeighbor(String word, Set<String> dict) {
+        List<String> neighbor = new ArrayList<>();
+        for (int i = 0; i < word.length(); i++) {
+            for (char c = 'a'; c <= 'z'; c++) {
+                if (c == word.charAt(i)) {
+                    continue;
+                }
+                String s = word.substring(0, i) + c + word.substring(i + 1);
+                if (dict.contains(s)) {
+                    neighbor.add(s);
+                }
+            }
+        }
+        return neighbor;
+    }
+}
